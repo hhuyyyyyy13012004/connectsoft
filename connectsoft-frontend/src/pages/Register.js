@@ -76,7 +76,7 @@ const Register = () => {
           </div>
 
           <div className="input-group">
-            <label>Email sinh viên (@hutech.edu.vn)</label>
+            <label>Email</label>
             <input
               type="email"
               placeholder="mi.vht123@hutech.edu.vn"
