@@ -9,16 +9,29 @@ const SearchPage = ({ openChat }) => {
   const [loading, setLoading] = useState(false);
   const keyword = searchParams.get("keyword") || "IT";
 
+  // Hàm tạo link ảnh dự phòng dựa trên tên công ty
+  const getFallbackImage = (companyName) => {
+    const name = encodeURIComponent(companyName || "Job");
+    return `https://ui-avatars.com/api/?name=${name}&background=00b894&color=fff&size=128&bold=true`;
+  };
+
+  // Hàm xử lý khi ảnh gốc bị lỗi link (404)
+  const handleImageError = (e, companyName) => {
+    e.target.onerror = null; // Ngăn vòng lặp vô tận nếu ảnh fallback cũng lỗi
+    e.target.src = getFallbackImage(companyName);
+  };
+
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
       try {
+        // Huy kiểm tra lại link Render Backend của mình có phải là link này không nhé
         const res = await axios.get(
           `https://connectsoft.onrender.com/api/category/${keyword}`,
         );
         setJobs(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Lỗi API:", err);
       } finally {
         setLoading(false);
       }
@@ -46,7 +59,7 @@ const SearchPage = ({ openChat }) => {
             <span className="result-count">({jobs.length} vị trí)</span>
           </h3>
           {loading ? (
-            <div className="loader">Đang tìm kiếm...</div>
+            <div className="loader">Đang tìm kiếm dữ liệu thực tế...</div>
           ) : (
             <div className="job-grid">
               {jobs.length > 0 ? (
@@ -59,25 +72,62 @@ const SearchPage = ({ openChat }) => {
                     transition={{ delay: i * 0.05 }}
                     whileHover={{ y: -5 }}
                   >
-                    <img
-                      className="company-logo"
-                      src={
-                        job.employer_logo || "https://via.placeholder.com/50"
-                      }
-                      alt="logo"
-                      onError={(e) =>
-                        (e.target.src = "https://via.placeholder.com/50")
-                      }
-                    />
-                    <div className="job-title">{job.job_title}</div>
-                    <div className="company-name">{job.employer_name}</div>
-                    <div className="job-location">
+                    <div
+                      className="company-logo-container"
+                      style={{
+                        background: "#f8f9fa",
+                        borderRadius: "12px",
+                        padding: "5px",
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: "15px",
+                      }}
+                    >
+                      <img
+                        className="company-logo"
+                        src={
+                          job.employer_logo ||
+                          getFallbackImage(job.employer_name)
+                        }
+                        alt={job.employer_name}
+                        onError={(e) => handleImageError(e, job.employer_name)}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </div>
+                    <div
+                      className="job-title"
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      {job.job_title}
+                    </div>
+                    <div
+                      className="company-name"
+                      style={{ color: "#636e72", marginBottom: "10px" }}
+                    >
+                      {job.employer_name}
+                    </div>
+                    <div
+                      className="job-location"
+                      style={{ fontSize: "0.9rem", color: "#b2bec3" }}
+                    >
                       📍 {job.job_city || "Toàn quốc"} •{" "}
                       {job.job_employment_type}
                     </div>
                     <button
                       className="btn-chat"
                       onClick={() => openChat(job.employer_name)}
+                      style={{ marginTop: "15px" }}
                     >
                       Chat ngay
                     </button>
