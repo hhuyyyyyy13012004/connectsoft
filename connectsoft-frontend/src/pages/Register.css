@@ -1,0 +1,116 @@
+/* ========================================== */
+/* STYLE CHUNG CHO CÁC TRANG AUTH (LOGIN/REGISTER) */
+/* ========================================== */
+
+.auth-container {
+  min-height: 100vh; /* Full chiều cao màn hình */
+  display: flex;
+  justify-content: center; /* Căn giữa ngang */
+  align-items: center; /* Căn giữa dọc */
+  background: #f0fffb; /* Màu nền xanh cực nhạt, tạo cảm giác an toàn, bảo mật */
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  padding: 50px;
+  border-radius: 24px; /* Bo góc lớn, thân thiện với sinh viên */
+  box-shadow: 0 10px 30px rgba(0, 184, 148, 0.1); /* Đổ bóng nhẹ, tạo chiều sâu */
+  width: 100%;
+  max-width: 450px; /* Độ rộng tối đa của form */
+  text-align: center;
+}
+
+/* Style tiêu đề */
+.auth-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #2d3436;
+}
+
+.auth-card h2 span {
+  color: var(--primary); /* Dùng màu Primary: #00b894 */
+}
+
+/* Style mô tả ngắn */
+.auth-subtitle {
+  color: #636e72;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+/* Style ô Input */
+.input-group {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #636e72;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 12px; /* Bo góc input */
+  border: 1px solid #e0e0e0;
+  outline: none;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: var(--primary); /* Đổi màu viền khi focus */
+  box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.1);
+}
+
+/* Style nút Đăng ký lớn */
+.btn-register-submit {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary); /* Màu Primary */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.3s;
+}
+
+.btn-register-submit:hover {
+  background: #00d2ad; /* Màu nhạt hơn khi hover */
+  transform: translateY(-2px); /* Hiệu ứng nổi lên */
+}
+
+/* Style phần Footer của card */
+.auth-footer {
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: #636e72;
+}
+
+.auth-footer span {
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-footer span:hover {
+  text-decoration: underline;
+}
+
+/* Style thông báo lỗi */
+.auth-error {
+  color: #ff7675; /* Màu đỏ */
+  background: #fff5f5;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
