@@ -3,21 +3,78 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+// --- Component Skeleton (Khung nhấp nháy) ---
+const JobSkeleton = () => (
+  <div className="job-card" style={{ cursor: "default" }}>
+    {/* Logo Skeleton */}
+    <div
+      className="skeleton"
+      style={{
+        width: "60px",
+        height: "60px",
+        borderRadius: "12px",
+        marginBottom: "15px",
+      }}
+    ></div>
+
+    {/* Title Skeleton */}
+    <div
+      className="skeleton"
+      style={{
+        width: "80%",
+        height: "20px",
+        marginBottom: "10px",
+        borderRadius: "4px",
+      }}
+    ></div>
+
+    {/* Company Skeleton */}
+    <div
+      className="skeleton"
+      style={{
+        width: "60%",
+        height: "15px",
+        marginBottom: "15px",
+        borderRadius: "4px",
+      }}
+    ></div>
+
+    {/* Location Skeleton */}
+    <div
+      className="skeleton"
+      style={{
+        width: "50%",
+        height: "15px",
+        marginBottom: "20px",
+        borderRadius: "4px",
+      }}
+    ></div>
+
+    {/* Button Skeleton */}
+    <div
+      className="skeleton"
+      style={{
+        width: "100%",
+        height: "35px",
+        borderRadius: "8px",
+      }}
+    ></div>
+  </div>
+);
+
 const SearchPage = ({ openChat }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const keyword = searchParams.get("keyword") || "IT";
 
-  // Hàm tạo link ảnh dự phòng dựa trên tên công ty
   const getFallbackImage = (companyName) => {
     const name = encodeURIComponent(companyName || "Job");
     return `https://ui-avatars.com/api/?name=${name}&background=00b894&color=fff&size=128&bold=true`;
   };
 
-  // Hàm xử lý khi ảnh gốc bị lỗi link (404)
   const handleImageError = (e, companyName) => {
-    e.target.onerror = null; // Ngăn vòng lặp vô tận nếu ảnh fallback cũng lỗi
+    e.target.onerror = null;
     e.target.src = getFallbackImage(companyName);
   };
 
@@ -25,7 +82,6 @@ const SearchPage = ({ openChat }) => {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        // Huy kiểm tra lại link Render Backend của mình có phải là link này không nhé
         const res = await axios.get(
           `https://connectsoft.onrender.com/api/category/${keyword}`,
         );
@@ -58,89 +114,100 @@ const SearchPage = ({ openChat }) => {
             Kết quả cho: <span className="search-keyword">"{keyword}"</span>{" "}
             <span className="result-count">({jobs.length} vị trí)</span>
           </h3>
-          {loading ? (
-            <div className="loader">Đang tìm kiếm dữ liệu thực tế...</div>
-          ) : (
-            <div className="job-grid">
-              {jobs.length > 0 ? (
-                jobs.map((job, i) => (
-                  <motion.div
-                    className="job-card"
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <div
-                      className="company-logo-container"
-                      style={{
-                        background: "#f8f9fa",
-                        borderRadius: "12px",
-                        padding: "5px",
-                        width: "60px",
-                        height: "60px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: "15px",
-                      }}
+
+          <div className="job-grid">
+            {loading ? (
+              // HIỂN THỊ SKELETON KHI ĐANG LOADING
+              <>
+                {[...Array(6)].map((_, i) => (
+                  <JobSkeleton key={i} />
+                ))}
+              </>
+            ) : (
+              // HIỂN THỊ DỮ LIỆU THẬT SAU KHI TẢI XONG
+              <>
+                {jobs.length > 0 ? (
+                  jobs.map((job, i) => (
+                    <motion.div
+                      className="job-card"
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ y: -5 }}
                     >
-                      <img
-                        className="company-logo"
-                        src={
-                          job.employer_logo ||
-                          getFallbackImage(job.employer_name)
-                        }
-                        alt={job.employer_name}
-                        onError={(e) => handleImageError(e, job.employer_name)}
+                      <div
+                        className="company-logo-container"
                         style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
+                          background: "#f8f9fa",
+                          borderRadius: "12px",
+                          padding: "5px",
+                          width: "60px",
+                          height: "60px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: "15px",
                         }}
-                      />
-                    </div>
-                    <div
-                      className="job-title"
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: "1.1rem",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      {job.job_title}
-                    </div>
-                    <div
-                      className="company-name"
-                      style={{ color: "#636e72", marginBottom: "10px" }}
-                    >
-                      {job.employer_name}
-                    </div>
-                    <div
-                      className="job-location"
-                      style={{ fontSize: "0.9rem", color: "#b2bec3" }}
-                    >
-                      📍 {job.job_city || "Toàn quốc"} •{" "}
-                      {job.job_employment_type}
-                    </div>
-                    <button
-                      className="btn-chat"
-                      onClick={() => openChat(job.employer_name)}
-                      style={{ marginTop: "15px" }}
-                    >
-                      Chat ngay
-                    </button>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="empty-state">
-                  <span className="empty-icon">🔍</span> Rất tiếc, không tìm
-                  thấy công việc phù hợp.
-                </div>
-              )}
-            </div>
-          )}
+                      >
+                        <img
+                          className="company-logo"
+                          src={
+                            job.employer_logo ||
+                            getFallbackImage(job.employer_name)
+                          }
+                          alt={job.employer_name}
+                          onError={(e) =>
+                            handleImageError(e, job.employer_name)
+                          }
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                      <div
+                        className="job-title"
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: "1.1rem",
+                          marginBottom: "5px",
+                        }}
+                      >
+                        {job.job_title}
+                      </div>
+                      <div
+                        className="company-name"
+                        style={{ color: "#636e72", marginBottom: "10px" }}
+                      >
+                        {job.employer_name}
+                      </div>
+                      <div
+                        className="job-location"
+                        style={{ fontSize: "0.9rem", color: "#b2bec3" }}
+                      >
+                        📍 {job.job_city || "Toàn quốc"} •{" "}
+                        {job.job_employment_type}
+                      </div>
+                      <button
+                        className="btn-chat"
+                        onClick={() => openChat(job.employer_name)}
+                        style={{ marginTop: "15px" }}
+                      >
+                        Chat ngay
+                      </button>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <span className="empty-icon">🔍</span> Rất tiếc, không tìm
+                    thấy công việc phù hợp.
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <aside className="sidebar">

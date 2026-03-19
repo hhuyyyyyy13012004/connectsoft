@@ -4,6 +4,52 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { COMPANY_LOGOS } from "../constants/CompanyLogos";
 
+// --- COMPONENT SKELETON CHO TRANG HOME ---
+const JobSkeleton = () => (
+  <div className="job-card" style={{ cursor: "default" }}>
+    <div
+      className="skeleton"
+      style={{
+        width: "50px",
+        height: "50px",
+        borderRadius: "10px",
+        marginBottom: "15px",
+      }}
+    ></div>
+    <div
+      className="skeleton"
+      style={{
+        width: "80%",
+        height: "20px",
+        marginBottom: "10px",
+        borderRadius: "4px",
+      }}
+    ></div>
+    <div
+      className="skeleton"
+      style={{
+        width: "60%",
+        height: "15px",
+        marginBottom: "10px",
+        borderRadius: "4px",
+      }}
+    ></div>
+    <div
+      className="skeleton"
+      style={{
+        width: "40%",
+        height: "15px",
+        marginBottom: "20px",
+        borderRadius: "4px",
+      }}
+    ></div>
+    <div
+      className="skeleton"
+      style={{ width: "100%", height: "35px", borderRadius: "20px" }}
+    ></div>
+  </div>
+);
+
 // ==========================================
 // HÀM XỬ LÝ LOGO THÔNG MINH
 // ==========================================
@@ -79,7 +125,7 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
 
   return (
     <div className="home-page">
-      {/* 1. HERO SECTION - ĐÃ KHÔI PHỤC ẢNH CŨ CỦA HUY */}
+      {/* 1. HERO SECTION */}
       <section className="hero-wrapper">
         <motion.div
           className="hero-content"
@@ -112,7 +158,6 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          {/* KHÔI PHỤC LINK ẢNH UNPLASH TẠI ĐÂY */}
           <img
             src="https://plus.unsplash.com/premium_vector-1682306737276-670b799c9d1c?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="hero illustration"
@@ -153,52 +198,60 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
         </div>
       </section>
 
-      {/* 4. DANH SÁCH VIỆC LÀM */}
+      {/* 4. DANH SÁCH VIỆC LÀM - ĐÃ CẬP NHẬT SKELETON TẠI ĐÂY */}
       <section className="company-section">
         <h3>Việc làm nổi bật hôm nay</h3>
-        {loading ? (
-          <div className="loader">Đang tải danh sách {activeCategory}...</div>
-        ) : (
-          <div className="job-grid">
-            {jobs.map((job, i) => (
-              <motion.div
-                className="job-card"
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <img
-                  className="company-logo"
-                  src={resolveLogo(job.employer_name, job.employer_logo)}
-                  alt={job.employer_name}
-                  onError={(e) => {
-                    e.target.onError = null;
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      job.employer_name,
-                    )}&background=random&color=fff`;
-                  }}
-                />
-                <div className="job-title">{job.job_title}</div>
-                <div className="company-name">{job.employer_name}</div>
-                <div className="job-location">
-                  📍 {job.job_city || "Việt Nam"}
-                </div>
-                <button
-                  className="btn-chat"
-                  onClick={() => openChat(job.employer_name)}
+        <div className="job-grid">
+          {loading ? (
+            // Hiển thị 6 cái Skeleton Card khi đang tải
+            <>
+              {[...Array(6)].map((_, i) => (
+                <JobSkeleton key={i} />
+              ))}
+            </>
+          ) : (
+            // Hiển thị dữ liệu thật
+            <>
+              {jobs.map((job, i) => (
+                <motion.div
+                  className="job-card"
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  Chat ngay
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                  <img
+                    className="company-logo"
+                    src={resolveLogo(job.employer_name, job.employer_logo)}
+                    alt={job.employer_name}
+                    onError={(e) => {
+                      e.target.onError = null;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        job.employer_name,
+                      )}&background=random&color=fff`;
+                    }}
+                  />
+                  <div className="job-title">{job.job_title}</div>
+                  <div className="company-name">{job.employer_name}</div>
+                  <div className="job-location">
+                    📍 {job.job_city || "Việt Nam"}
+                  </div>
+                  <button
+                    className="btn-chat"
+                    onClick={() => openChat(job.employer_name)}
+                  >
+                    Chat ngay
+                  </button>
+                </motion.div>
+              ))}
+            </>
+          )}
+        </div>
       </section>
 
-      {/* 5. DOANH NGHIỆP TIÊU BIỂU */}
+      {/* ... CÁC PHẦN CÒN LẠI GIỮ NGUYÊN ... */}
       <section className="company-section">
         <h3>Doanh nghiệp tiêu biểu</h3>
         <div className="company-list">
@@ -219,7 +272,7 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
         </div>
       </section>
 
-      {/* 6. VIDEO SECTION */}
+      {/* VIDEO SECTION */}
       <section className="video-section">
         <h3>Một ngày làm việc</h3>
         <p className="video-description">
@@ -243,7 +296,8 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
           ))}
         </div>
       </section>
-      {/* 7. STATS SECTION - THỐNG KÊ TÁC ĐỘNG */}
+
+      {/* STATS SECTION */}
       <section className="stats-section">
         <div className="stats-grid">
           {[
@@ -267,9 +321,7 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
         </div>
       </section>
 
-      {/* 8. FOOTER - CHÂN TRANG */}
-
-      {/* 8. TESTIMONIALS - CHIA SẺ TỪ SINH VIÊN */}
+      {/* TESTIMONIALS SECTION */}
       <section className="testimonials-section">
         <h3>Sinh viên nói gì về ConnectSoft?</h3>
         <div className="testimonial-grid">
@@ -312,7 +364,7 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
         </div>
       </section>
 
-      {/* 9. FINAL CTA - KÊU GỌI HÀNH ĐỘNG */}
+      {/* FINAL CTA */}
       <section className="final-cta">
         <motion.div
           className="cta-container"
@@ -340,6 +392,7 @@ const Home = ({ videoData, setSelectedVideoUrl, openChat }) => {
           </div>
         </motion.div>
       </section>
+
       <footer className="footer-wrapper">
         <div className="footer-content">
           <div className="footer-brand">
