@@ -48,7 +48,7 @@ The project follows a decoupled architecture:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/connectsoft.git
+git clone https://github.com/hhuyyyyyy13012004/connectsoft.git
 cd connectsoft
 ```
 
