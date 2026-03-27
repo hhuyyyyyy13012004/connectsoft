@@ -4,7 +4,11 @@ const axios = require("axios");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose"); // Đảm bảo đã npm install mongoose
+const mongoose = require("mongoose");
+
+// --- IMPORT MODELS & ROUTES ---
+const User = require("./models/User"); // Sử dụng Model đã nâng cấp ở Bước 1
+const userRoutes = require("./routes/userRoutes"); // Route xử lý Profile & CV
 
 const app = express();
 app.use(cors());
@@ -14,27 +18,15 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "ConnectSoft_Secret_2026";
 
 // ==========================================
-// KẾT NỐI MONGODB LOCAL (Dùng biến từ .env)
+// KẾT NỐI MONGODB
 // ==========================================
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() =>
-    console.log("🚀 Đã kết nối MongoDB LOCAL qua Compass thành công!"),
-  )
-  .catch((err) => console.error("❌ Lỗi kết nối Local DB:", err));
-
-// --- BƯỚC QUAN TRỌNG: Tạo khuôn mẫu người dùng ---
-const UserSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
-const User = mongoose.model("User", UserSchema);
-
-// --- XÓA DÒNG NÀY: const users = []; (Không dùng mảng tạm nữa) ---
+  .then(() => console.log("🚀 Đã kết nối MongoDB thành công!"))
+  .catch((err) => console.error("❌ Lỗi kết nối DB:", err));
 
 // ==========================================
-// 1. CHỨC NĂNG HỆ THỐNG (Giữ nguyên logic của Huy)
+// 1. CHỨC NĂNG HỆ THỐNG (JSearch API)
 // ==========================================
 const fetchJobs = async (query) => {
   try {
@@ -80,15 +72,17 @@ app.get("/api/category/:name", async (req, res) => {
 });
 
 // ==========================================
-// 2. CHỨC NĂNG ĐĂNG KÝ & ĐĂNG NHẬP (Dùng Database)
+// 2. ROUTES NGƯỜI DÙNG & PROFILE
 // ==========================================
 
-// API Đăng ký - Đã sửa để dùng User Model
+// Gắn Route cập nhật Hồ sơ & CV vào prefix /api/users
+app.use("/api/users", userRoutes);
+
+// API Đăng ký
 app.post("/api/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body; // Đổi 'name' thành 'username' cho khớp Model mới
 
-    // Kiểm tra trùng email TRONG DATABASE
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email này đã tồn tại!" });
@@ -96,23 +90,24 @@ app.post("/api/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // LƯU VÀO MONGODB
-    const newUser = new User({ name, email, password: hashedPassword });
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      profile: { fullName: username }, // Khởi tạo profile cơ bản
+    });
     await newUser.save();
 
-    console.log("👤 Người dùng mới đã lưu vào DB:", newUser.name);
     res.status(201).json({ message: "Đăng ký thành công!" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống khi đăng ký" });
   }
 });
 
-// API Đăng nhập - Đã sửa để tìm trong Database
+// API Đăng nhập
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // TÌM TRONG MONGODB
     const user = await User.findOne({ email });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -121,14 +116,22 @@ app.post("/api/login", async (req, res) => {
         .json({ message: "Email hoặc mật khẩu không chính xác!" });
     }
 
-    const token = jwt.sign({ id: user._id, name: user.name }, JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      JWT_SECRET,
+      {
+        expiresIn: "24h",
+      },
+    );
 
     res.json({
       message: "Đăng nhập thành công!",
       token,
-      user: { name: user.name, email: user.email },
+      user: {
+        id: user._id, // Trả về ID để Frontend gọi API update profile sau này
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống khi đăng nhập" });
