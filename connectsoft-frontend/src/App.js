@@ -7,14 +7,13 @@ import {
 } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Import các trang và thành phần
 import Home from "./pages/Home";
 import SearchPage from "./pages/SearchPage";
 import Login from "./pages/Login";
-import Register from "./pages/Register"; // Đã có sẵn
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 
-// Import CSS tổng hợp
 import "./App.css";
 
 const videoData = [
@@ -38,7 +37,6 @@ const videoData = [
   },
 ];
 
-// --- COMPONENT ĐIỀU HƯỚNG CÓ HIỆU ỨNG ---
 const AnimatedRoutes = ({ setSelectedVideoUrl, openChat }) => {
   const location = useLocation();
 
@@ -88,9 +86,6 @@ const AnimatedRoutes = ({ setSelectedVideoUrl, openChat }) => {
             </motion.div>
           }
         />
-        {/* ========================================== */}
-        {/* KHAI BÁO ROUTE ĐĂNG KÝ MỚI Ở ĐÂY */}
-        {/* ========================================== */}
         <Route
           path="/register"
           element={
@@ -101,6 +96,19 @@ const AnimatedRoutes = ({ setSelectedVideoUrl, openChat }) => {
               transition={{ duration: 0.3 }}
             >
               <Register />
+            </motion.div>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Profile />
             </motion.div>
           }
         />
@@ -150,15 +158,11 @@ function App() {
       <div className="App">
         <Navbar />
 
-        {/* Phần nội dung chính với hiệu ứng chuyển trang */}
         <AnimatedRoutes
           setSelectedVideoUrl={setSelectedVideoUrl}
           openChat={openChat}
         />
 
-        {/* --- CÁC THÀNH PHẦN NỔI (OVERLAYS) --- */}
-
-        {/* Video Modal */}
         {selectedVideoUrl && (
           <motion.div
             className="video-modal-overlay"
@@ -187,7 +191,6 @@ function App() {
           </motion.div>
         )}
 
-        {/* Chat Popup */}
         <AnimatePresence>
           {chatInfo.open && (
             <motion.div

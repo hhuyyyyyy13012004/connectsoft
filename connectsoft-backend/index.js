@@ -6,9 +6,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
-// --- IMPORT MODELS & ROUTES ---
-const User = require("./models/User"); // Sử dụng Model đã nâng cấp ở Bước 1
-const userRoutes = require("./routes/userRoutes"); // Route xử lý Profile & CV
+const User = require("./models/User");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 app.use(cors());
@@ -17,17 +16,11 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "ConnectSoft_Secret_2026";
 
-// ==========================================
-// KẾT NỐI MONGODB
-// ==========================================
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("🚀 Đã kết nối MongoDB thành công!"))
-  .catch((err) => console.error("❌ Lỗi kết nối DB:", err));
+  .then(() => console.log("Đã kết nối MongoDB thành công!"))
+  .catch((err) => console.error("Lỗi kết nối DB:", err));
 
-// ==========================================
-// 1. CHỨC NĂNG HỆ THỐNG (JSearch API)
-// ==========================================
 const fetchJobs = async (query) => {
   try {
     const options = {
@@ -48,7 +41,7 @@ const fetchJobs = async (query) => {
     const response = await axios.request(options);
     return response.data.data;
   } catch (error) {
-    console.error("❌ Lỗi gọi JSearch API:", error.message);
+    console.error("Lỗi gọi JSearch API:", error.message);
     throw error;
   }
 };
@@ -71,17 +64,11 @@ app.get("/api/category/:name", async (req, res) => {
   }
 });
 
-// ==========================================
-// 2. ROUTES NGƯỜI DÙNG & PROFILE
-// ==========================================
-
-// Gắn Route cập nhật Hồ sơ & CV vào prefix /api/users
 app.use("/api/users", userRoutes);
 
-// API Đăng ký
 app.post("/api/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body; // Đổi 'name' thành 'username' cho khớp Model mới
+    const { username, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -94,7 +81,7 @@ app.post("/api/register", async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      profile: { fullName: username }, // Khởi tạo profile cơ bản
+      profile: { fullName: username },
     });
     await newUser.save();
 
@@ -104,7 +91,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// API Đăng nhập
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -128,8 +114,10 @@ app.post("/api/login", async (req, res) => {
       message: "Đăng nhập thành công!",
       token,
       user: {
-        id: user._id, // Trả về ID để Frontend gọi API update profile sau này
+        id: user._id,
         username: user.username,
+        fullName: user.profile?.fullName || user.username,
+        avatarUrl: user.profile?.avatarUrl || "",
         email: user.email,
       },
     });
@@ -139,5 +127,5 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.listen(PORT, () =>
-  console.log(`🚀 ConnectSoft Backend đang chạy tại cổng ${PORT}`),
+  console.log(`ConnectSoft Backend đang chạy tại cổng ${PORT}`),
 );

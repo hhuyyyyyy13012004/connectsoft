@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import "./Register.css"; // BẮT BUỘC: Import file CSS vừa tạo
+import "./Register.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -15,15 +15,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset lỗi mỗi lần bấm đăng ký
+    setError("");
+
     try {
-      // Gọi API Fullstack thực tế
-      await axios.post(
-        "https://connectsoft.onrender.com/api/register",
-        formData,
-      );
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, formData);
       alert(
-        "🎉 Đăng ký thành công! Hãy đăng nhập để bắt đầu lộ trình của bạn.",
+        "Đăng ký thành công! Hãy đăng nhập để bắt đầu lộ trình của bạn.",
       );
       navigate("/login");
     } catch (err) {
@@ -34,16 +31,13 @@ const Register = () => {
   };
 
   return (
-    // Sử dụng class auth-container mới
     <div className="auth-container">
-      {/* Thêm hiệu ứng Framer Motion giống Login */}
       <motion.div
         className="auth-card"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Logo Clickable trung tâm */}
         <div
           className="logo"
           onClick={() => navigate("/")}
@@ -59,7 +53,6 @@ const Register = () => {
           Nền tảng khởi tạo lộ trình sự nghiệp cho riêng bạn.
         </p>
 
-        {/* Hiển thị lỗi nếu có */}
         {error && <p className="auth-error">{error}</p>}
 
         <form onSubmit={handleSubmit}>
@@ -70,7 +63,7 @@ const Register = () => {
               placeholder="Võ Hương Trà Mi"
               required
               onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
+                setFormData({ ...formData, username: e.target.value })
               }
             />
           </div>

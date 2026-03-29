@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { JSEARCH_API_BASE_URL } from "../utils/api";
 
-// --- Component Skeleton (Khung nhấp nháy) ---
 const JobSkeleton = () => (
   <div className="job-card" style={{ cursor: "default" }}>
-    {/* Logo Skeleton */}
     <div
       className="skeleton"
       style={{
@@ -16,8 +15,6 @@ const JobSkeleton = () => (
         marginBottom: "15px",
       }}
     ></div>
-
-    {/* Title Skeleton */}
     <div
       className="skeleton"
       style={{
@@ -27,8 +24,6 @@ const JobSkeleton = () => (
         borderRadius: "4px",
       }}
     ></div>
-
-    {/* Company Skeleton */}
     <div
       className="skeleton"
       style={{
@@ -38,8 +33,6 @@ const JobSkeleton = () => (
         borderRadius: "4px",
       }}
     ></div>
-
-    {/* Location Skeleton */}
     <div
       className="skeleton"
       style={{
@@ -49,8 +42,6 @@ const JobSkeleton = () => (
         borderRadius: "4px",
       }}
     ></div>
-
-    {/* Button Skeleton */}
     <div
       className="skeleton"
       style={{
@@ -83,7 +74,7 @@ const SearchPage = ({ openChat }) => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://connectsoft.onrender.com/api/category/${keyword}`,
+          `${JSEARCH_API_BASE_URL}/api/category/${keyword}`,
         );
         setJobs(res.data);
       } catch (err) {
@@ -92,6 +83,7 @@ const SearchPage = ({ openChat }) => {
         setLoading(false);
       }
     };
+
     fetchJobs();
     window.scrollTo(0, 0);
   }, [keyword]);
@@ -117,14 +109,12 @@ const SearchPage = ({ openChat }) => {
 
           <div className="job-grid">
             {loading ? (
-              // HIỂN THỊ SKELETON KHI ĐANG LOADING
               <>
                 {[...Array(6)].map((_, i) => (
                   <JobSkeleton key={i} />
                 ))}
               </>
             ) : (
-              // HIỂN THỊ DỮ LIỆU THẬT SAU KHI TẢI XONG
               <>
                 {jobs.length > 0 ? (
                   jobs.map((job, i) => (
@@ -239,4 +229,5 @@ const SearchPage = ({ openChat }) => {
     </motion.div>
   );
 };
+
 export default SearchPage;
